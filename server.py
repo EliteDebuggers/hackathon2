@@ -1,11 +1,15 @@
+import os
 import hashlib
 import hmac
 import time
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+from dotenv import load_dotenv
+from flask import render_template_string
 
+load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 CORS(app, resources={
     r"/api/*": {
         "origins": "http://127.0.0.1:5500",
@@ -14,8 +18,8 @@ CORS(app, resources={
     }
 })
 
-SHARED_SECRET = b"NTrustHackathonR2B2" #secret key to be shared between server and client to verify authenticity
-VALIDITY_WINDOW = 30 #signature validity is 30s
+SHARED_SECRET = os.getenv("SHARED_SECRET", "NTrustHackathonR2B2").encode("utf-8") #secret key to be shared between server and client to verify authenticity
+VALIDITY_WINDOW = os.getenv("VALIDITY_WINDOW", "30").encode("utf-8") #signature validity is 30s
 
 # server setup hmac
 
@@ -27,7 +31,7 @@ def verify_request_integrity():
         return False, "Missing NTrust Security Headers"
 
     try:
-        if abs(int(time.time()) - int(timestamp)) > VALIDITY_WINDOW:
+        if abs(int(time.time()) - int(timestamp)) > int(VALIDITY_WINDOW):
             return False, "Your request is expired or replay attact detected!"
     except ValueError:
             return False, "Invalid timestamp format"
@@ -41,9 +45,14 @@ def verify_request_integrity():
 
     return True, "OK"
 
+@app.route('/')
+def index():
+    return render_template('index.html', 
+env_secret=os.getenv('SHARED_SECRET'))
+
 @app.before_request
 def enforce_ntrust_security():
-    if request.method == "OPTIONS" or request.path == "/health":
+    if request.method == "OPTIONS" or request.path in ["/health", "/"]:
         return
 
     is_valid, reason = verify_request_integrity()

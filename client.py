@@ -1,11 +1,15 @@
+import os
 import hashlib
 import hmac
 import time
 import requests
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SERVER_URL = "http://127.0.0.1:5000/api/v1/delete-user"
-SHARED_SECRET = b"NTrustHackathonR2B2"
+SHARED_SECRET = os.getenv("SHARED_SECRET").encode("utf-8") #secret key
 
 def send_authenticated_requests(username):
     timestamp = str(int(time.time()))

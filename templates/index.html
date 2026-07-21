@@ -19,7 +19,9 @@
     <pre id="output">No request sent yet.</pre>
     
     <script>
-        const SECRET = "NTrustHackathonR2B2"
+        // flask inject variables in js when server start
+        const SHARED_SECRET = "{{ env_secret }}";
+
         const ENDPOINT = "http://127.0.0.1:5000/api/v1/delete-user";
 
         async function computeHMAC(secret, message) {
@@ -41,7 +43,7 @@
 
             // ntrust signature payload 
             const message = `${timestamp}:POST:/api/v1/delete-user:${body}`;
-            const signature = await computeHMAC(SECRET, message);
+            const signature = await computeHMAC(SHARED_SECRET, message);
 
             try {
                 const res = await fetch(ENDPOINT, {
