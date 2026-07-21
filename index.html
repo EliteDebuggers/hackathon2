@@ -3,15 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber 2</title>
+    <title>NTrust</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
 </head>
-<body>
-    <div class="main">
-        <h1 class="container"></h1>
-    </div>
+<body style="padding: 2rem;">
+    <h2>NTrust Web Application</h2>
+    <p>Target User to Delete:</p>
+    <input type="text" id="username" value="user" />
+    <button onclick="sendSignedRequest()">Devele User</button>
+
+    <h3>Server Response:</h3>
+    <pre id="output">No request sent yet.</pre>
+    
+    <script>
+        const SECRET = "ntrust"
+        const ENDPOINT = "http://127.0.0.1:5000/api/v1/delete-user";
+
+        async function computeHMAC(secret, message) {
+            const encoder = new TextEncoder();
+            const key = await crypto.subtle.importKey(
+                'raw', encoder.encode(secret),
+                { name: 'HMAC', hash: 'SHA-256' },
+                false, ['sign']
+            );
+            const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
+            return Array.from(new Uint8Array(signatureBuffer))
+                .map(b => b.toString(16).pasStart(2, '0')),join('');
+
+        }
+
+       
+    </script>
 </body>
 </html>
