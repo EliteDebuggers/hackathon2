@@ -35,7 +35,32 @@
 
         }
 
-       
+        async function sendSignedRequest() {
+            const username = document.getElementById("username").value;
+            const timestamp = Math.floor(Date.now() / 1000).toString();
+            const body = JSON.stringify({ username });
+
+            // ntrust signature payload 
+            const message = `${timestamp}:POST:/api/v1/delete-user:${body}`;
+            const signature = await computeHMAC(SECRET, message);
+
+            try {
+                const res = await fetch(ENDPOINT, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "apploation/json",
+                        "X-Timestamp": timestamp,
+                        "X-Signature": signature
+                    },
+                    body: body
+                });
+
+                const data = await res.json();
+                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById("outpur").textContent = "Error: " + err.message;
+            }
+        }
     </script>
 </body>
 </html>
