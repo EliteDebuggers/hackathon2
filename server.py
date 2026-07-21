@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-SHARED_SECRET = B"HackathonR2B2" #secret
+SHARED_SECRET = b"NTrustHackathonR2B2" #secret key to be shared between server and client to verify authenticity
 VALIDITY_WINDOW = 30 #signature validity is 30s
 
 # server setup hmac
@@ -15,13 +15,13 @@ def verify_request_intergity():
     signature = request.headers.get("x-Signature")
 
     if not timestamp or not signature:
-        return Flase, "Missing NTrust Security Headers (X-Timestamp / X-Signature)"
+        return Flase, "Missing NTrust Security Headers"
 
     try:
         if abs(int(time.time()) - int(timestamp)) > VALIDITY_WINDOW:
-            return Flase, "Your request is expired or replay attact detected."
+            return Flase, "Your request is expired or replay attact detected!"
         except ValueError:
-            return False, "Invalid timestamp formate"
+            return False, "Invalid timestamp format"
 
     body = request.get_data(as_text=True)
     message = f"{timestamp}:{request.method}:{request.path}:{body}".encode("utf-8")
@@ -32,6 +32,31 @@ def verify_request_intergity():
 
     return True, "OK"
 
-    
+@app.before_request
+def enforce_ntrust_security():
+    if request.path == "/health":
+        return
+
+    is-valid, reason = verify_request_intergity()
+    if not is_valid:
+        return jsonify({
+            "status": "BLOCKED BY NTRUST",
+            "reason": reason,
+            "threat_type": "UNAUTHORISED_SOUCE_CODE_EXPLOIT_ATTEMPT_DETECTED"
+        }), 403
+
+@app.route("/api/v1/delete-user", methods=["POST"])
+def delete_user():
+    data = request.get_json(silent=True) or {}
+    username = data.get("username", "unknown")
+
+    return jsonify({
+        "status": "SUCCESS",
+        "message": f"User '{username}' was permanently deleted."
+    }), 200
+
+if __name__ == "__main__":
+    print("NTrust is running on http://127.0.0.1:5000")
+    app.run(port=5000, debug=True)
 
 
