@@ -3,65 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NTrust</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+
+    <title>NTrust • Request Integrity Verification</title>
+
+    <link rel="apple-touch-icon"
+      href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
+
+<link rel="icon"
+      href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+
+<link rel="icon"
+      href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+
+<link rel="manifest"
+      href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body style="padding: 2rem;">
-    <h2>NTrust Web Application</h2>
-    <p>Target User to Delete:</p>
-    <input type="text" id="username" value="user" />
-    <button onclick="sendSignedRequest()">Delete User</button>
 
-    <h3>Server Response:</h3>
-    <pre id="output">No request sent yet.</pre>
-    
-    <script>
-        // flask inject variables in js when server start
-        const SHARED_SECRET = "{{ env_secret }}";
+<body>
 
-        const ENDPOINT = "http://127.0.0.1:5000/api/v1/delete-user";
+<div class="background-grid"></div>
 
-        async function computeHMAC(secret, message) {
-            const encoder = new TextEncoder();
-            const key = await crypto.subtle.importKey(
-                'raw', encoder.encode(secret),
-                { name: 'HMAC', hash: 'SHA-256' },
-                false, ['sign']
-            );
-            const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
-            return Array.from(new Uint8Array(signatureBuffer))
-                .map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+<header class="navbar">
+    <div class="logo">
+        <div class="logo-circle">
+        </div>
 
-        async function sendSignedRequest() {
-            const username = document.getElementById("username").value;
-            const timestamp = Math.floor(Date.now() / 1000).toString();
-            const body = JSON.stringify({ username });
+        <div>
+            <h1>NTrust</h1>
+            <span>Request Integrity Verification System</span>
+        </div>
 
-            // ntrust signature payload 
-            const message = `${timestamp}:POST:/api/v1/delete-user:${body}`;
-            const signature = await computeHMAC(SHARED_SECRET, message);
+    </div>
+    <div class="connection-status">
+        <span class="status-dot"></span>
+        Secure Connection
+    </div>
 
-            try {
-                const res = await fetch(ENDPOINT, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Timestamp": timestamp,
-                        "X-Signature": signature
-                    },
-                    body: body
-                });
+</header>
+<section class="hero">
+    <h2>
+        Source Code Public.
+        <span>Security Intact.</span>
+    </h2>
+    <p>
+        Every API request is cryptographically signed using HMAC-SHA256,
+        validated with timestamp verification, and protected against replay attacks.
+    </p>
+</section>
 
-                const data = await res.json();
-                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-            } catch (err) {
-                document.getElementById("output").textContent = "Error: " + err.message;
-            }
-        }
-    </script>
+<main class="dashboard">
+    <section class="left-column">
+        <div class="card">
+            <div class="card-header">
+                <h3>Security Status</h3>
+            </div>
+            <div class="security-list">
+                <div class="security-item">
+                    <span class="indicator active"></span>
+                    HMAC Authentication
+                </div>
+
+                <div class="security-item">
+                    <span class="indicator active"></span>
+                    Request Integrity
+                </div>
+
+                <div class="security-item">
+                    <span class="indicator active"></span>
+                    Replay Protection
+                </div>
+
+                <div class="security-item">
+                    <span class="indicator active"></span>
+                    Timestamp Validation
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Secure Request</h3>
+            </div>
+            <label for="username">
+                Target Username
+            </label>
+            <input
+                id="username"
+                type="text"
+                value="user123"
+                placeholder="Enter username"
+            >
+
+            <button
+                id="sendBtn"
+                onclick="sendSignedRequest()">
+                Send Signed Request
+            </button>
+        </div>
+    </section>
+
+    <section class="right-column">
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Live Request Details</h3>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail">
+                    <span>Method</span>
+                    <strong>POST</strong>
+                </div>
+
+                <div class="detail">
+                    <span>Endpoint</span>
+                    <strong>/api/v1/delete-user</strong>
+                </div>
+
+                <div class="detail">
+                    <span>Timestamp</span>
+                    <strong id="timestampField">Waiting...</strong>
+                </div>
+                <div class="detail">
+                    <span>Status</span>
+                    <strong id="requestStatus">
+                        Idle
+                    </strong>
+                </div>
+            </div>
+            <hr>
+            <label for="signatureField">Generated Signature</label>
+
+            <textarea
+                id="signatureField"
+                readonly
+                rows="4">Waiting...</textarea>
+
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>Server Response</h3>
+            </div>
+            <pre id="output">
+No request sent.
+            </pre>
+        </div>
+    </section>
+</main>
+
+<section class="console-section">
+    <div class="card">
+        <div class="card-header">
+            <h3>Activity Console</h3>
+        </div>
+
+        <div id="consoleLog" class="console">
+            <div>
+                <span class="time">SYSTEM</span>
+                Waiting for secure request...
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p>
+        NTrust Security Demonstration • Hackathon Project
+    </p>
+</footer>
+
+<!-- Flask Variables -->
+
+<script>
+const SHARED_SECRET = "{{ env_secret }}";
+const ENDPOINT = "http://127.0.0.1:5000/api/v1/delete-user";
+</script>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 </html>

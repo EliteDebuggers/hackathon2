@@ -48,11 +48,11 @@ def verify_request_integrity():
 @app.route('/')
 def index():
     return render_template('index.html', 
-env_secret=os.getenv('SHARED_SECRET'))
+env_secret=os.getenv('SHARED_SECRET', 'NTrustHackathonR2B2'))
 
 @app.before_request
 def enforce_ntrust_security():
-    if request.method == "OPTIONS" or request.path in ["/health", "/"]:
+    if request.method == "OPTIONS" or request.path in ["/health", "/", "/favicon.ico"] or request.path.startswith("/static/"):
         return
 
     is_valid, reason = verify_request_integrity()
