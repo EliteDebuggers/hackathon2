@@ -18,7 +18,7 @@ CORS(app, resources={
     }
 })
 
-SHARED_SECRET = os.getenv("SHARED_SECRET", "NTrustHackathonR2B2").encode("utf-8") #secret key to be shared between server and client to verify authenticity
+SHARED_SECRET = os.getenv("SHARED_SECRET").encode("utf-8") #secret key to be shared between server and client to verify authenticity
 VALIDITY_WINDOW = os.getenv("VALIDITY_WINDOW", "30").encode("utf-8") #signature validity is 30s
 
 # server setup hmac
@@ -28,7 +28,7 @@ def verify_request_integrity():
     signature = request.headers.get("x-Signature")
 
     if not timestamp or not signature:
-        return False, "Missing NTrust Security Headers"
+        return False, "Missing PRAMAN Security Headers"
 
     try:
         if abs(int(time.time()) - int(timestamp)) > int(VALIDITY_WINDOW):
@@ -51,14 +51,14 @@ def index():
 env_secret=os.getenv('SHARED_SECRET'))
 
 @app.before_request
-def enforce_ntrust_security():
+def enforce_praman_security():
     if request.method == "OPTIONS" or request.path in ["/health", "/"]:
         return
 
     is_valid, reason = verify_request_integrity()
     if not is_valid:
         return jsonify({
-            "status": "BLOCKED BY NTRUST",
+            "status": "BLOCKED BY PRAMAN",
             "reason": reason,
             "threat_type": "UNAUTHORISED_SOURCE_CODE_EXPLOIT_ATTEMPT_DETECTED"
         }), 403
@@ -74,7 +74,7 @@ def delete_user():
     }), 200
 
 if __name__ == "__main__":
-    print("NTrust is running on http://127.0.0.1:5000")
+    print("PRAMAN is running on http://127.0.0.1:5000")
     app.run(port=5000, debug=True)
 
 
