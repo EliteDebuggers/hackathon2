@@ -5,8 +5,10 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-SHARED_SECRET = B"my_private_signing_key_2026"
+SHARED_SECRET = B"HackathonR2B2" #secret
 VALIDITY_WINDOW = 30 #signature validity is 30s
+
+# server setup hmac
 
 def verify_request_intergity():
     timestamp = request.headers.get("X-Timestamp")
@@ -23,9 +25,13 @@ def verify_request_intergity():
 
     body = request.get_data(as_text=True)
     message = f"{timestamp}:{request.method}:{request.path}:{body}".encode("utf-8")
-    expected_sig = hmac.new)SHARED_SECRET
+    expected_sig = hmac.new(SHARED_SECRET, message, hasglib.sha256),hexdigest()
+
+    if not hmac.compare_digest(expected_sig, signature):
+        return False, "Invalid Signature! Potential tampering or unauthorised source code exploit."
+
+    return True, "OK"
 
     
 
 
-    
