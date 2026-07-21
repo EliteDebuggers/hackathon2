@@ -2,8 +2,17 @@ import hashlib
 import hmac
 import time
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "http://127.0.0.1:5500",
+        "allow_headers": ["Content-Type", "X-Timestamp", "X-Signature"],
+        "expose_headers": ["X-Timestamp", "X-Signature"]
+    }
+})
 
 SHARED_SECRET = b"NTrustHackathonR2B2" #secret key to be shared between server and client to verify authenticity
 VALIDITY_WINDOW = 30 #signature validity is 30s
@@ -34,7 +43,7 @@ def verify_request_integrity():
 
 @app.before_request
 def enforce_ntrust_security():
-    if request.path == "/health":
+    if request.method == "OPTIONS" or request.path == "/health":
         return
 
     is_valid, reason = verify_request_integrity()
@@ -42,7 +51,7 @@ def enforce_ntrust_security():
         return jsonify({
             "status": "BLOCKED BY NTRUST",
             "reason": reason,
-            "threat_type": "UNAUTHORISED_SOUCE_CODE_EXPLOIT_ATTEMPT_DETECTED"
+            "threat_type": "UNAUTHORISED_SOURCE_CODE_EXPLOIT_ATTEMPT_DETECTED"
         }), 403
 
 @app.route("/api/v1/delete-user", methods=["POST"])

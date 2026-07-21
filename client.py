@@ -30,4 +30,4 @@ def send_authenticated_requests(username):
     print("Response Body:", response.json())
 
 if __name__ == "__main__":
-    send_authenticated_requests("user")
+    send_authenticated_requests("stark")

@@ -13,13 +13,13 @@
     <h2>NTrust Web Application</h2>
     <p>Target User to Delete:</p>
     <input type="text" id="username" value="user" />
-    <button onclick="sendSignedRequest()">Devele User</button>
+    <button onclick="sendSignedRequest()">Delete User</button>
 
     <h3>Server Response:</h3>
     <pre id="output">No request sent yet.</pre>
     
     <script>
-        const SECRET = "ntrust"
+        const SECRET = "NTrustHackathonR2B2"
         const ENDPOINT = "http://127.0.0.1:5000/api/v1/delete-user";
 
         async function computeHMAC(secret, message) {
@@ -31,8 +31,7 @@
             );
             const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
             return Array.from(new Uint8Array(signatureBuffer))
-                .map(b => b.toString(16).pasStart(2, '0')),join('');
-
+                .map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         async function sendSignedRequest() {
@@ -48,7 +47,7 @@
                 const res = await fetch(ENDPOINT, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "apploation/json",
+                        "Content-Type": "application/json",
                         "X-Timestamp": timestamp,
                         "X-Signature": signature
                     },
@@ -58,7 +57,7 @@
                 const data = await res.json();
                 document.getElementById("output").textContent = JSON.stringify(data, null, 2);
             } catch (err) {
-                document.getElementById("outpur").textContent = "Error: " + err.message;
+                document.getElementById("output").textContent = "Error: " + err.message;
             }
         }
     </script>
