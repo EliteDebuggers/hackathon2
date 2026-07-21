@@ -1,15 +1,71 @@
 # PRAMAN: Zero-Trust Security Middleware
 
-# Express/Flask Middelware ( Javascript/Python )
+🛡️ PRAMAN
+Trust No Request. Verify Every Request.
+PRAMAN is a plug-and-play Zero Trust middleware for Express and Flask that secures APIs by verifying every incoming request. Instead of relying on hidden source code, PRAMAN assumes attackers may already know your backend implementation and focuses on runtime verification.
 
-### Theme : 
-Even if the attacker sees all backend source code logic, they cannot exploit dyanamic endpoints without valid signed runtime signatures.
+---
 
-### Features : 
-* **True Plug n Play**: Secure your entire app with just 1 line of code.
-* **Zero-Trust**: Endpoints are locked down cryptographically.
-* **Tamper-Proof**: Uses HMAC-SHA256 based on time, method, path, and payload.
-* **Replay Attack Defense**: 30-second strict signature validity window.
+### Features
+Plug-and-Play Integration
+
+* Designed for an excellent developer experience (DX).
+* Simply import the middleware and add a single line to your existing Express or Flask application.
+- No complex routing changes or endpoint refactoring required.
+
+---
+
+### Zero-Trust API Protection
+PRAMAN follows the Zero Trust security model.
+
+- Even if attackers know your backend source code, API routes, and application logic, they cannot successfully access protected endpoints without generating a valid signed request.
+
+---
+
+### Cryptographic Request Verification
+Every request is protected using HMAC-SHA256 signatures.
+
+The signature includes:
+- Request body
+- API path
+- HTTP method
+- Timestamp
+
+If any part of the request is modified, the signature immediately becomes invalid and the request is rejected.
+
+---
+
+### ⏱ Replay Attack Prevention
+Each request contains a timestamp.
+
+- Requests are accepted only within a configurable validity window (for example, 30 seconds).
+- Even if an attacker captures a valid request, replaying it after the allowed time window will automatically fail.
+
+---
+
+### Lightweight & Developer Friendly
+
+- Plug-and-play installation
+- Minimal configuration
+- Express support
+- Flask support
+- Easy integration into existing projects
+
+---
+
+### Problem Statement
+CYBER-02: The Attacker Has the Source Code
+
+Modern applications should remain secure even when attackers know the implementation details.
+
+PRAMAN ensures security through request verification instead of code secrecy.
+
+---
+
+### 💡 Philosophy
+Trust No Request. Verify Every Request.
+Don't call it Authentication Middleware , ->  Zero Trust Middleware
+
 
 ### How it works : 
 Requires incoming client requests to include a short-lived HMAC signature computed using the timestamp and the payload hash.
