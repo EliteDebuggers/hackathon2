@@ -25,7 +25,7 @@ def verify_request_integrity():
 
     body = request.get_data(as_text=True)
     message = f"{timestamp}:{request.method}:{request.path}:{body}".encode("utf-8")
-    expected_sig = hmac.new(SHARED_SECRET, message, hashlib.sha256),hexdigest()
+    expected_sig = hmac.new(SHARED_SECRET, message, hashlib.sha256).hexdigest()
 
     if not hmac.compare_digest(expected_sig, signature):
         return False, "Invalid Signature! Potential tampering or unauthorised source code exploit."

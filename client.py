@@ -1,14 +1,14 @@
 import hashlib
 import hmac
 import time
-import request
+import requests
 import json
 
 SERVER_URL = "http://127.0.0.1:5000/api/v1/delete-user"
 SHARED_SECRET = b"NTrustHackathonR2B2"
 
-def send_authenticated_request(username):
-    timestamp = str9int(time.time())
+def send_authenticated_requests(username):
+    timestamp = str(int(time.time()))
     payload = json.dumps({"username": username})
 
     #signature payload: timestamp "http_method:path:body"
@@ -23,11 +23,11 @@ def send_authenticated_request(username):
         "X-Signature": signature
     }
 
-    print("Sending request via NTrust Client...")
-    response = request.post(SERVER_URL, data=payload, headers=headers)
+    print("Sending requests via NTrust Client...")
+    response = requests.post(SERVER_URL, data=payload, headers=headers)
 
     print(f"Status Code: {response.status_code}")
     print("Response Body:", response.json())
 
 if __name__ == "__main__":
-    send_authenticated_request("user")
+    send_authenticated_requests("user")
