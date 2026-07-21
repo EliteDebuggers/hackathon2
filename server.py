@@ -25,7 +25,21 @@ PramanMiddleware(app, secret_key=SHARED_SECRET, validity_window=VALIDITY_WINDOW)
 
 @app.route('/')
 def index():
-    return render_template('index.html', env_secret=SHARED_SECRET)
+    return render_template('index.html', 
+env_secret=os.getenv('SHARED_SECRET'))
+
+@app.before_request
+def enforce_praman_security():
+    if request.method == "OPTIONS" or request.path in ["/health", "/"]:
+        return
+
+    is_valid, reason = verify_request_integrity()
+    if not is_valid:
+        return jsonify({
+            "status": "BLOCKED BY PRAMAN",
+            "reason": reason,
+            "threat_type": "UNAUTHORISED_SOURCE_CODE_EXPLOIT_ATTEMPT_DETECTED"
+        }), 403
 
 @app.route("/api/v1/delete-user", methods=["POST"])
 def delete_user():
