@@ -27,7 +27,7 @@ def send_authenticated_requests(username):
         "X-Signature": signature
     }
 
-    print("Sending requests via NTrust Client...")
+    print("Sending requests via PRAMAN Client...")
     response = requests.post(SERVER_URL, data=payload, headers=headers)
 
     print(f"Status Code: {response.status_code}")

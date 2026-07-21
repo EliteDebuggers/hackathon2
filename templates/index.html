@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
 
     <title>NTrust • Request Integrity Verification</title>
 
@@ -25,6 +26,19 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+=======
+    <title>PRAMAN</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body style="padding: 2rem;">
+    <h2>PRAMAN Web Application</h2>
+    <p>Target User to Delete:</p>
+    <input type="text" id="username" value="user" />
+    <button onclick="sendSignedRequest()">Delete User</button>
+>>>>>>> f04a36976fafd6d85febef212690908f31e2cb25
 
 <body>
 
@@ -40,11 +54,17 @@
             <span>Request Integrity Verification System</span>
         </div>
 
+<<<<<<< HEAD
     </div>
     <div class="connection-status">
         <span class="status-dot"></span>
         Secure Connection
     </div>
+=======
+            // PRAMAN signature payload 
+            const message = `${timestamp}:POST:/api/v1/delete-user:${body}`;
+            const signature = await computeHMAC(SHARED_SECRET, message);
+>>>>>>> f04a36976fafd6d85febef212690908f31e2cb25
 
 </header>
 <section class="hero">
