@@ -4,64 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRAMAN</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-</head>
-<body style="padding: 2rem;">
-    <h2>PRAMAN Web Application</h2>
-    <p>Target User to Delete:</p>
-    <input type="text" id="username" value="user" />
-    <button onclick="sendSignedRequest()">Delete User</button>
-
-    <h3>Server Response:</h3>
-    <pre id="output">No request sent yet.</pre>
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="background-grid"></div>
+    
+    <main class="container">
+        <h2>PRAMAN Web Application</h2>
+        
+        <div class="card">
+            <label for="username">Target User to Delete:</label>
+            <input type="text" id="username" value="user" />
+            <button onclick="sendSignedRequest()">Delete User</button>
+        </div>
+
+        <div class="card">
+            <h3>Server Response:</h3>
+            <pre id="output">No request sent yet.</pre>
+        </div>
+    </main>
+
     <script>
         // flask inject variables in js when server start
         const SHARED_SECRET = "{{ env_secret }}";
-
         const ENDPOINT = "http://127.0.0.1:5000/api/v1/delete-user";
-
-        async function computeHMAC(secret, message) {
-            const encoder = new TextEncoder();
-            const key = await crypto.subtle.importKey(
-                'raw', encoder.encode(secret),
-                { name: 'HMAC', hash: 'SHA-256' },
-                false, ['sign']
-            );
-            const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
-            return Array.from(new Uint8Array(signatureBuffer))
-                .map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function sendSignedRequest() {
-            const username = document.getElementById("username").value;
-            const timestamp = Math.floor(Date.now() / 1000).toString();
-            const body = JSON.stringify({ username });
-
-            // PRAMAN signature payload 
-            const message = `${timestamp}:POST:/api/v1/delete-user:${body}`;
-            const signature = await computeHMAC(SHARED_SECRET, message);
-
-            try {
-                const res = await fetch(ENDPOINT, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-Timestamp": timestamp,
-                        "X-Signature": signature
-                    },
-                    body: body
-                });
-
-                const data = await res.json();
-                document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-            } catch (err) {
-                document.getElementById("output").textContent = "Error: " + err.message;
-            }
-        }
     </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
